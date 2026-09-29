@@ -1,0 +1,34 @@
+services:
+  agentgateway:
+    image: cr.agentgateway.dev/agentgateway:v1.5.0
+    command: ["-f", "/config/config.yaml"]
+    volumes:
+      - ./gateway/config.yaml:/config/config.yaml:ro
+      - ./keys/private:/keys:ro          # the ONLY place the private key exists
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./keys/public:/keys:ro           # public key only
+
+  agent:
+    image: python:3.12-alpine
+    command: ["sleep", "infinity"]
+    environment:
+      GATEWAY_URL: http://agentgateway:3000
+    volumes:
+      - ./agent:/agent:ro                # code only: no keys, no tokens
+    depends_on:
+      - agentgateway
+
+  # Stands in for anyone who can read the backend's logs and reach its port.
+  attacker:
+    image: python:3.12-alpine
+    command: ["sleep", "infinity"]
+    volumes:
+      - ./attacker:/attacker:ro
+    depends_on:
+      - backend
+      - agentgateway

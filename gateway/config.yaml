@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://agentgateway.dev/schema/config
+# agentgateway v1.5.0 standalone config.
+# Every field below is from the v1.5.0 schema (schema/config.md) and the
+# "Signed JWT (jwtSign)" standalone docs page on agentgateway.dev.
+gateways:
+  default:
+    port: 3000
+routes:
+- name: orders-api
+  backends:
+  - host: backend:8080
+    policies:
+      backendAuth:
+        jwtSign:
+          signingKey:
+            file: /keys/signing-key.pem
+          alg: ES256
+          kid: agw-demo-key-1
+          claims:
+            iss: agentgateway-demo
+            sub: orders-agent
+            aud: orders-api
+            scope: orders:read
+          # Short on purpose so the replay demo does not take five minutes.
+          # agentgateway's default is 300s.
+          ttl: 15s
