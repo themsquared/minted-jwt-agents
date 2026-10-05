@@ -1,5 +1,7 @@
 # minted-jwt-agents
 
+> 📖 **Read the write-up:** [Per-Request Minted JWTs for Agent Backends with agentgateway](https://webofmike.com/minted-jwts/)
+
 An AI agent calls a backend through [agentgateway](https://agentgateway.dev) and holds no credential for it. No API key in the environment, no key file on disk, no token. agentgateway signs a fresh ES256 JWT with its own private key on every request (`backendAuth.jwtSign`, new in agentgateway v1.5), and the backend verifies it with the matching public key. Tokens live 15 seconds, so one lifted from a log is worthless shortly after it was minted.
 
 This is the same key-pair JWT pattern the Snowflake SQL API requires, run locally against a mock backend with `docker compose`. No cloud account needed.
